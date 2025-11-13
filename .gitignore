@@ -1,5 +1,18 @@
-node_modules/
-*.log
-.DS_Store
-.env
+# Terraform
+.terraform/
+*.tfplan
+*.tfvars
 
+# Keep terraform.tfstate in repo as per user preference
+# terraform.tfstate
+# terraform.tfstate.backup
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
