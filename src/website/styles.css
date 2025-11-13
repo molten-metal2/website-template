@@ -1,11 +1,1 @@
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  padding: 1rem;
-}
 
-.navbar-left,
-.navbar-right {
-  display: flex;
-  gap: 1rem;
-}
