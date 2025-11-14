@@ -138,6 +138,25 @@ resource "aws_cognito_user_pool_domain" "main" {
   user_pool_id = aws_cognito_user_pool.main.id
 }
 
+# Google Identity Provider
+resource "aws_cognito_identity_provider" "google" {
+  user_pool_id  = aws_cognito_user_pool.main.id
+  provider_name = "Google"
+  provider_type = "Google"
+
+  provider_details = {
+    authorize_scopes = "email openid profile"
+    client_id        = var.google_client_id
+    client_secret    = var.google_client_secret
+  }
+
+  attribute_mapping = {
+    email    = "email"
+    username = "sub"
+    name     = "name"
+  }
+}
+
 resource "aws_cognito_user_pool_client" "main" {
   name         = "politicnz-web-client"
   user_pool_id = aws_cognito_user_pool.main.id
@@ -155,9 +174,10 @@ resource "aws_cognito_user_pool_client" "main" {
     "https://${aws_cloudfront_distribution.website.domain_name}/index.html"
   ]
 
-  # Supported identity providers (initially just Cognito, Google will be added in Phase 3)
-  supported_identity_providers = ["COGNITO"]
+  supported_identity_providers = ["Google"]
 
   generate_secret = false
+
+  depends_on = [aws_cognito_identity_provider.google]
 }
 
