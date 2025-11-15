@@ -4,7 +4,3 @@
   align-items: center;
   gap: 15px;
 }
-
-.navbar > div > a:last-child {
-  margin-left: auto;
-}
