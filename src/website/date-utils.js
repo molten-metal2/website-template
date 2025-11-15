@@ -3,11 +3,23 @@
  * Provides consistent date/time formatting across the application
  */
 
+function ensureUtc(isoString) {
+  if (!isoString) return isoString;
+  // Add 'Z' suffix if not already present and no timezone info
+  if (!isoString.endsWith('Z') && !isoString.includes('+') && !isoString.includes('T')) {
+    return isoString;
+  }
+  if (!isoString.endsWith('Z') && isoString.includes('T') && !isoString.includes('+')) {
+    return isoString + 'Z';
+  }
+  return isoString;
+}
+
 function formatPostTime(isoString) {
   if (!isoString) return '';
   
   try {
-    const date = new Date(isoString);
+    const date = new Date(ensureUtc(isoString));
     return date.toLocaleDateString('en-NZ', {
       timeZone: 'Pacific/Auckland',
       year: 'numeric',
@@ -25,7 +37,7 @@ function formatDate(isoString) {
   if (!isoString) return 'N/A';
   
   try {
-    const date = new Date(isoString);
+    const date = new Date(ensureUtc(isoString));
     return date.toLocaleDateString('en-NZ', {
       timeZone: 'Pacific/Auckland',
       year: 'numeric',
@@ -43,7 +55,7 @@ function formatRelativeTime(isoString) {
   if (!isoString) return '';
   
   try {
-    const date = new Date(isoString);
+    const date = new Date(ensureUtc(isoString));
     const now = new Date();
     const diffMs = now - date;
     const diffSecs = Math.floor(diffMs / 1000);
