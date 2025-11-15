@@ -1,7 +1,7 @@
 // Shared Post Utilities
 // This file contains reusable functions for rendering and managing posts
 
-function createPostElement(post, isOwner, showEditButton = false) {
+function createPostElement(post, isOwner, showEditButton = false, showDeleteButton = false) {
   const postCard = document.createElement('div');
   postCard.className = 'post-card';
   postCard.dataset.postId = post.post_id;
@@ -10,12 +10,14 @@ function createPostElement(post, isOwner, showEditButton = false) {
   
   // Build action buttons HTML
   let actionsHtml = '';
-  if (isOwner) {
+  if (isOwner && (showEditButton || showDeleteButton)) {
     actionsHtml = '<div class="post-actions">';
     if (showEditButton) {
       actionsHtml += `<button class="edit-btn" onclick="editPost('${post.post_id}')">Edit</button>`;
     }
+    if (showDeleteButton) {
     actionsHtml += `<button class="delete-btn" onclick="deletePostConfirm('${post.post_id}')">Delete</button>`;
+    }
     actionsHtml += '</div>';
   }
   
@@ -33,9 +35,9 @@ function createPostElement(post, isOwner, showEditButton = false) {
     </div>
     ${showEditButton ? `
       <div class="post-edit-form" style="display: none;">
-        <textarea class="edit-input" maxlength="280">${escapeHtml(post.content)}</textarea>
+        <textarea class="edit-input" maxlength="${getValidationConstants().POST_CONTENT_MAX_LENGTH}">${escapeHtml(post.content)}</textarea>
         <div class="edit-footer">
-          <span class="edit-char-counter">${post.content.length}/280</span>
+          <span class="edit-char-counter">${post.content.length}/${getValidationConstants().POST_CONTENT_MAX_LENGTH}</span>
           <div class="edit-buttons">
             <button class="cancel-edit-btn" onclick="cancelEdit('${post.post_id}')">Cancel</button>
             <button class="save-edit-btn" onclick="saveEditPost('${post.post_id}')">Save</button>
@@ -50,9 +52,10 @@ function createPostElement(post, isOwner, showEditButton = false) {
     const editInput = postCard.querySelector('.edit-input');
     const editCharCounter = postCard.querySelector('.edit-char-counter');
     if (editInput && editCharCounter) {
+      const maxLength = getValidationConstants().POST_CONTENT_MAX_LENGTH;
       editInput.addEventListener('input', () => {
         const length = editInput.value.length;
-        editCharCounter.textContent = `${length}/280`;
+        editCharCounter.textContent = `${length}/${maxLength}`;
       });
     }
   }
@@ -118,7 +121,7 @@ window.saveEdit = async function(postId, onSuccess) {
     alert('Failed to update post: ' + error.message);
     saveBtn.disabled = false;
     saveBtn.textContent = 'Save';
-  }
+}
 };
 
 window.deletePostConfirm = function(postId) {

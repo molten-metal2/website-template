@@ -127,7 +127,8 @@ function updateBioCounter() {
   const bio = document.getElementById('bio');
   const charCount = bio.value.length;
   const counter = document.getElementById('bio-counter');
-  counter.textContent = `${charCount}/500 characters`;
+  const maxLength = getValidationConstants().BIO_MAX_LENGTH;
+  counter.textContent = `${charCount}/${maxLength} characters`;
 }
 
 async function loadUserPosts() {
@@ -163,9 +164,10 @@ async function loadUserPosts() {
     
     // Display each post
     posts.forEach(post => {
-      // Show edit button only if viewing own profile
+      // Show edit and delete buttons only if viewing own profile
       const showEditButton = ProfileView.isOwnProfile;
-      const postElement = createPostElement(post, ProfileView.isOwnProfile, showEditButton);
+      const showDeleteButton = ProfileView.isOwnProfile;
+      const postElement = createPostElement(post, ProfileView.isOwnProfile, showEditButton, showDeleteButton);
       postsElement.appendChild(postElement);
     });
     

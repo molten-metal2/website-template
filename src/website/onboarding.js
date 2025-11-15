@@ -67,9 +67,10 @@ document.getElementById('onboardingForm').addEventListener('submit', async (e) =
 });
 
 // Real-time character counter for bio
+const bioConstants = getValidationConstants();
 document.getElementById('bio').addEventListener('input', (e) => {
   const charCount = e.target.value.length;
   const small = e.target.parentElement.querySelector('small');
-  small.textContent = `${charCount}/500 characters`;
+  small.textContent = `${charCount}/${bioConstants.BIO_MAX_LENGTH} characters`;
 });
 
