@@ -6,6 +6,6 @@
 
 const CONFIG = {
   COGNITO_DOMAIN: 'politicnz-auth.auth.ap-southeast-2.amazoncognito.com',
-  CLIENT_ID: 'REPLACE_WITH_TERRAFORM_OUTPUT_cognito_client_id'
+  CLIENT_ID: '1vuusuh3i8fspdh15009reimrm'
 };
 
