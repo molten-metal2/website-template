@@ -29,7 +29,7 @@ function createPostElement(post, isOwner, showEditButton = false) {
   postCard.innerHTML = `
     <div class="post-header">
       <div class="post-author">
-        <strong><a href="profile.html?user_id=${post.user_id}" class="username-link">${escapeHtml(post.display_name)}</a></strong>
+        <strong><a href="profile.html?user_id=${post.user_id}">${escapeHtml(post.display_name)}</a></strong>
         <span class="post-time">${formatPostTime(post.created_at)}</span>
         ${editedLabel}
       </div>
