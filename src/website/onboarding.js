@@ -35,6 +35,7 @@ document.getElementById('onboardingForm').addEventListener('submit', async (e) =
     const displayName = document.getElementById('display_name').value.trim();
     const bio = document.getElementById('bio').value.trim();
     const politicalAlignment = document.getElementById('political_alignment').value;
+    const profilePrivate = document.getElementById('profile_private').checked;
     
     // Client-side validation
     const validation = validateProfileData(displayName, bio, politicalAlignment);
@@ -46,7 +47,8 @@ document.getElementById('onboardingForm').addEventListener('submit', async (e) =
     const profileData = {
       display_name: displayName,
       bio: bio,
-      political_alignment: politicalAlignment
+      political_alignment: politicalAlignment,
+      profile_private: profilePrivate
     };
     
     // Create profile

@@ -12,6 +12,18 @@ const ProfileView = {
   isOwnProfile: false
 };
 
+
+function displayPrivacyNotice(profile, isOwnProfile) {
+  const bioField = document.getElementById('bio');
+  
+  if (!isOwnProfile && profile.profile_private) {
+    // Show notice that profile is private
+    bioField.placeholder = 'This user has chosen to keep their profile private';
+  } else {
+    bioField.placeholder = 'Tell us about yourself';
+  }
+}
+
 async function loadProfile() {
   const loading = document.getElementById('loading');
   const profileContent = document.getElementById('profile-content');
@@ -57,6 +69,7 @@ async function loadProfile() {
     document.getElementById('display_name').value = profile.display_name || '';
     document.getElementById('bio').value = profile.bio || '';
     document.getElementById('political_alignment').value = profile.political_alignment || '';
+    document.getElementById('profile_private').checked = profile.profile_private || false;
     
     // Display read-only fields
     document.getElementById('user_id').textContent = profile.user_id || 'N/A';
@@ -64,6 +77,9 @@ async function loadProfile() {
     document.getElementById('updated_at').textContent = formatDate(profile.updated_at);
     
     updateBioCounter();
+    
+    // Show privacy notice if viewing a private profile
+    displayPrivacyNotice(profile, ProfileView.isOwnProfile);
     
     setViewMode();
     
@@ -96,6 +112,7 @@ function setViewMode() {
   document.getElementById('display_name').disabled = true;
   document.getElementById('bio').disabled = true;
   document.getElementById('political_alignment').disabled = true;
+  document.getElementById('profile_private').disabled = true;
   
   // Show/hide buttons
   document.getElementById('view-mode-buttons').style.display = 'block';
@@ -113,6 +130,7 @@ function setEditMode() {
   document.getElementById('display_name').disabled = false;
   document.getElementById('bio').disabled = false;
   document.getElementById('political_alignment').disabled = false;
+  document.getElementById('profile_private').disabled = false;
   
   // Show/hide buttons
   document.getElementById('view-mode-buttons').style.display = 'none';

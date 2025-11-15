@@ -29,9 +29,10 @@ def lambda_handler(event, context):
     display_name = body.get('display_name', '').strip()
     bio = body.get('bio', '').strip()
     political_alignment = body.get('political_alignment', '').strip()
+    profile_private = body.get('profile_private', False)
     
     # Validate all fields
-    is_valid, error_msg = validate_profile_data(display_name, bio, political_alignment)
+    is_valid, error_msg = validate_profile_data(display_name, bio, political_alignment, profile_private)
     if not is_valid:
         return error_response(error_msg)
     
@@ -42,6 +43,7 @@ def lambda_handler(event, context):
         'display_name': display_name,
         'bio': bio,
         'political_alignment': political_alignment,
+        'profile_private': profile_private,
         'created_at': timestamp,
         'updated_at': timestamp
     }

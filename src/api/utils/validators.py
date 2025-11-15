@@ -53,7 +53,17 @@ def validate_post_content(content):
     return (True, None)
 
 
-def validate_profile_data(display_name, bio=None, political_alignment=None, for_update=False):
+def validate_profile_private(profile_private):
+    if profile_private is None:
+        return (True, None)
+    
+    if not isinstance(profile_private, bool):
+        return (False, 'profile_private must be a boolean value')
+    
+    return (True, None)
+
+
+def validate_profile_data(display_name, bio=None, political_alignment=None, profile_private=None, for_update=False):
     if for_update and not display_name:
         pass  # Skip display_name validation if empty during update
     else:
@@ -66,6 +76,10 @@ def validate_profile_data(display_name, bio=None, political_alignment=None, for_
         return (is_valid, error)
     
     is_valid, error = validate_political_alignment(political_alignment)
+    if not is_valid:
+        return (is_valid, error)
+    
+    is_valid, error = validate_profile_private(profile_private)
     if not is_valid:
         return (is_valid, error)
     

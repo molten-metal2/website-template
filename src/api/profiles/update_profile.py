@@ -30,9 +30,10 @@ def lambda_handler(event, context):
     display_name = body.get('display_name', '').strip() if body.get('display_name') else ''
     bio = body.get('bio', '').strip() if 'bio' in body else None
     political_alignment = body.get('political_alignment', '').strip() if 'political_alignment' in body else None
+    profile_private = body.get('profile_private') if 'profile_private' in body else None
     
     # Validate all provided fields
-    is_valid, error_msg = validate_profile_data(display_name, bio, political_alignment, for_update=True)
+    is_valid, error_msg = validate_profile_data(display_name, bio, political_alignment, profile_private, for_update=True)
     if not is_valid:
         return error_response(error_msg)
     
@@ -56,6 +57,10 @@ def lambda_handler(event, context):
     if political_alignment is not None:
         update_expression += ", political_alignment = :political_alignment"
         expression_values[':political_alignment'] = political_alignment
+    
+    if profile_private is not None:
+        update_expression += ", profile_private = :profile_private"
+        expression_values[':profile_private'] = profile_private
     
     # Update profile
     response = table.update_item(

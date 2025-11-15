@@ -11,6 +11,23 @@ from utils.helpers import (
 
 table = get_table('TABLE_NAME')
 
+
+def filter_private_profile(profile, is_own_profile):
+    # If viewing own profile or profile is not private, return full profile
+    if is_own_profile or not profile.get('profile_private', False):
+        return profile
+    
+    # For private profiles viewed by others, only show name and metadata
+    return {
+        'user_id': profile.get('user_id'),
+        'display_name': profile.get('display_name'),
+        'bio': '',
+        'political_alignment': '',
+        'profile_private': True,
+        'created_at': profile.get('created_at'),
+        'updated_at': profile.get('updated_at')
+    }
+
 @error_handler
 def lambda_handler(event, context):
     """
@@ -30,5 +47,11 @@ def lambda_handler(event, context):
     if 'Item' not in response:
         return not_found_response('Profile not found')
     
-    return success_response(response['Item'])
+    # Determine if viewing own profile
+    is_own_profile = auth_user_id == target_user_id
+    
+    # Filter profile data based on privacy settings
+    filtered_profile = filter_private_profile(response['Item'], is_own_profile)
+    
+    return success_response(filtered_profile)
 

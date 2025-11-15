@@ -39,6 +39,7 @@ async function handleProfileSubmit(e) {
     const displayName = document.getElementById('display_name').value.trim();
     const bio = document.getElementById('bio').value.trim();
     const politicalAlignment = document.getElementById('political_alignment').value;
+    const profilePrivate = document.getElementById('profile_private').checked;
     
     // Client-side validation
     const validation = validateProfileData(displayName, bio, politicalAlignment);
@@ -49,7 +50,8 @@ async function handleProfileSubmit(e) {
     const hasChanges = 
       displayName !== ProfileView.originalProfile.display_name ||
       bio !== ProfileView.originalProfile.bio ||
-      politicalAlignment !== ProfileView.originalProfile.political_alignment;
+      politicalAlignment !== ProfileView.originalProfile.political_alignment ||
+      profilePrivate !== (ProfileView.originalProfile.profile_private || false);
     
     if (!hasChanges) {
       successMessage.textContent = 'No changes to save';
@@ -62,7 +64,8 @@ async function handleProfileSubmit(e) {
     const updates = {
       display_name: displayName,
       bio: bio,
-      political_alignment: politicalAlignment
+      political_alignment: politicalAlignment,
+      profile_private: profilePrivate
     };
     
     await updateProfile(updates);
@@ -70,6 +73,7 @@ async function handleProfileSubmit(e) {
     ProfileView.originalProfile.display_name = displayName;
     ProfileView.originalProfile.bio = bio;
     ProfileView.originalProfile.political_alignment = politicalAlignment;
+    ProfileView.originalProfile.profile_private = profilePrivate;
     ProfileView.originalProfile.updated_at = new Date().toISOString();
     
     // Update the updated_at display
@@ -104,6 +108,7 @@ function handleCancelEdit() {
     document.getElementById('display_name').value = ProfileView.originalProfile.display_name || '';
     document.getElementById('bio').value = ProfileView.originalProfile.bio || '';
     document.getElementById('political_alignment').value = ProfileView.originalProfile.political_alignment || '';
+    document.getElementById('profile_private').checked = ProfileView.originalProfile.profile_private || false;
     
     updateBioCounter();
     
