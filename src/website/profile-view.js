@@ -14,13 +14,27 @@ const ProfileView = {
 
 
 function displayPrivacyNotice(profile, isOwnProfile) {
-  const bioField = document.getElementById('bio');
+  const bioFieldContainer = document.getElementById('bio-field');
+  const politicalAlignmentContainer = document.getElementById('political-alignment-field');
+  const privacyFieldContainer = document.getElementById('privacy-field');
+  const privacyNotice = document.getElementById('privacy-notice');
   
-  if (!isOwnProfile && profile.profile_private) {
-    // Show notice that profile is private
-    bioField.placeholder = 'This user has chosen to keep their profile private';
+  // Hide privacy checkbox when viewing another user's profile
+  if (!isOwnProfile) {
+    privacyFieldContainer.style.display = 'none';
   } else {
-    bioField.placeholder = 'Tell us about yourself';
+    privacyFieldContainer.style.display = 'block';
+  }
+  
+  // Hide bio and political alignment if viewing a private profile
+  if (!isOwnProfile && profile.profile_private) {
+    bioFieldContainer.style.display = 'none';
+    politicalAlignmentContainer.style.display = 'none';
+    privacyNotice.style.display = 'block';
+  } else {
+    bioFieldContainer.style.display = 'block';
+    politicalAlignmentContainer.style.display = 'block';
+    privacyNotice.style.display = 'none';
   }
 }
 
