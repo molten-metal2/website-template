@@ -1,4 +1,12 @@
 terraform {
+  backend "s3" {
+    bucket         = "politicnz-terraform-state"
+    key            = "terraform.tfstate"
+    region         = "ap-southeast-2"
+    dynamodb_table = "politicnz-terraform-locks"
+    encrypt        = true
+  }
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -10,6 +18,10 @@ terraform {
 provider "aws" {
   region = var.aws_region
 }
+
+#####################################################################
+# WEBSITE HOSTING
+#####################################################################
 
 # S3 bucket for website hosting
 resource "aws_s3_bucket" "website" {
@@ -101,7 +113,8 @@ resource "aws_cloudfront_distribution" "website" {
 
   restrictions {
     geo_restriction {
-      restriction_type = "none"
+        restriction_type = "whitelist"
+        locations        = ["NZ", "AU"]
     }
   }
 
@@ -113,5 +126,66 @@ resource "aws_cloudfront_distribution" "website" {
     Name        = "PoliticNZ CloudFront"
     Environment = "Production"
   }
+}
+
+#####################################################################
+# COGNITO SETUP
+#####################################################################
+
+resource "aws_cognito_user_pool" "main" {
+  name = "politicnz-user-pool"
+
+  tags = {
+    Name        = "PoliticNZ User Pool"
+    Environment = "Production"
+  }
+}
+
+resource "aws_cognito_user_pool_domain" "main" {
+  domain       = var.cognito_domain_prefix
+  user_pool_id = aws_cognito_user_pool.main.id
+}
+
+# Google Identity Provider
+resource "aws_cognito_identity_provider" "google" {
+  user_pool_id  = aws_cognito_user_pool.main.id
+  provider_name = "Google"
+  provider_type = "Google"
+
+  provider_details = {
+    authorize_scopes = "email openid profile"
+    client_id        = var.politicnz_sandbox_google_client_id
+    client_secret    = var.politicnz_sandbox_google_client_secret
+  }
+
+  attribute_mapping = {
+    email    = "email"
+    username = "sub"
+    name     = "name"
+  }
+}
+
+resource "aws_cognito_user_pool_client" "main" {
+  name         = "politicnz-web-client"
+  user_pool_id = aws_cognito_user_pool.main.id
+
+  allowed_oauth_flows_user_pool_client = true
+  allowed_oauth_flows                  = ["code"]
+  allowed_oauth_scopes                 = ["email", "openid", "profile"]
+
+  callback_urls = [
+    "https://${aws_cloudfront_distribution.website.domain_name}/index.html",
+    "https://${aws_cloudfront_distribution.website.domain_name}/"
+  ]
+
+  logout_urls = [
+    "https://${aws_cloudfront_distribution.website.domain_name}/index.html"
+  ]
+
+  supported_identity_providers = ["Google"]
+
+  generate_secret = false
+
+  depends_on = [aws_cognito_identity_provider.google]
 }
 

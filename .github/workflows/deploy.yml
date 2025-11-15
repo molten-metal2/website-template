@@ -1,9 +1,13 @@
-name: Deploy to AWS S3 and CloudFront
+name: Deploy to AWS
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -27,16 +31,22 @@ jobs:
           terraform_wrapper: false
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -reconfigure
         working-directory: ./terraform
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan
         working-directory: ./terraform
+        env:
+          TF_VAR_google_client_id: ${{ secrets.SANDBOX_POLITICNZ_GOOGLE_CLIENT_ID }}
+          TF_VAR_google_client_secret: ${{ secrets.SANDBOX_POLITICNZ_GOOGLE_CLIENT_SECRET }}
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
         working-directory: ./terraform
+        env:
+          TF_VAR_google_client_id: ${{ secrets.SANDBOX_POLITICNZ_GOOGLE_CLIENT_ID }}
+          TF_VAR_google_client_secret: ${{ secrets.SANDBOX_POLITICNZ_GOOGLE_CLIENT_SECRET }}
 
       - name: Get Terraform Outputs
         id: tf_outputs
@@ -63,6 +73,3 @@ jobs:
         run: |
           echo "✅ Deployment successful!"
           echo "🌐 Your website is live at: ${{ steps.tf_outputs.outputs.website_url }}"
-          echo "📦 S3 Bucket: ${{ steps.tf_outputs.outputs.bucket_name }}"
-          echo "☁️ CloudFront Distribution: ${{ steps.tf_outputs.outputs.cloudfront_id }}"
-
