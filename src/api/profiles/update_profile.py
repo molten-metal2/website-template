@@ -1,7 +1,3 @@
-import json
-import os
-import boto3
-from datetime import datetime
 from utils.response_builder import (
     success_response,
     error_response,
@@ -9,9 +5,14 @@ from utils.response_builder import (
     error_handler
 )
 from utils.validators import validate_profile_data
+from utils.helpers import (
+    get_user_id_from_event,
+    get_table,
+    get_current_timestamp,
+    parse_request_body
+)
 
-dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table(os.environ['TABLE_NAME'])
+table = get_table('TABLE_NAME')
 
 @error_handler
 def lambda_handler(event, context):
@@ -20,10 +21,10 @@ def lambda_handler(event, context):
     Authenticated endpoint - user_id extracted from Cognito JWT
     """
     # Extract user_id from Cognito authorizer claims
-    user_id = event['requestContext']['authorizer']['claims']['sub']
+    user_id = get_user_id_from_event(event)
     
     # Parse request body
-    body = json.loads(event.get('body', '{}'))
+    body = parse_request_body(event)
     
     # Extract fields (allowing None for fields not being updated)
     display_name = body.get('display_name', '').strip() if body.get('display_name') else ''
@@ -42,7 +43,7 @@ def lambda_handler(event, context):
     
     # Build update expression dynamically
     update_expression = "SET updated_at = :updated_at"
-    expression_values = {':updated_at': datetime.utcnow().isoformat()}
+    expression_values = {':updated_at': get_current_timestamp()}
     
     if display_name:
         update_expression += ", display_name = :display_name"

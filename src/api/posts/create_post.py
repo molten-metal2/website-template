@@ -1,8 +1,4 @@
-import json
-import os
-import boto3
 import uuid
-from datetime import datetime
 from botocore.exceptions import ClientError
 from utils.response_builder import (
     success_response,
@@ -12,10 +8,15 @@ from utils.response_builder import (
     error_handler
 )
 from utils.validators import validate_post_content
+from utils.helpers import (
+    get_user_id_from_event,
+    get_table,
+    get_current_timestamp,
+    parse_request_body
+)
 
-dynamodb = boto3.resource('dynamodb')
-posts_table = dynamodb.Table(os.environ['POSTS_TABLE_NAME'])
-profiles_table = dynamodb.Table(os.environ['PROFILES_TABLE_NAME'])
+posts_table = get_table('POSTS_TABLE_NAME')
+profiles_table = get_table('PROFILES_TABLE_NAME')
 
 @error_handler
 def lambda_handler(event, context):
@@ -24,10 +25,10 @@ def lambda_handler(event, context):
     Authenticated endpoint - user_id extracted from Cognito JWT
     """
     # Extract user_id from Cognito authorizer claims
-    user_id = event['requestContext']['authorizer']['claims']['sub']
+    user_id = get_user_id_from_event(event)
     
     # Parse request body
-    body = json.loads(event.get('body', '{}'))
+    body = parse_request_body(event)
     
     # Validate content
     content = body.get('content', '').strip()
@@ -46,7 +47,7 @@ def lambda_handler(event, context):
         return server_error_response('Failed to retrieve user profile')
     
     # Create post
-    timestamp = datetime.utcnow().isoformat()
+    timestamp = get_current_timestamp()
     post_id = str(uuid.uuid4())
     
     post = {

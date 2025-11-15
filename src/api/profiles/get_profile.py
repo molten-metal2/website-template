@@ -1,13 +1,15 @@
-import os
-import boto3
 from utils.response_builder import (
     success_response,
     not_found_response,
     error_handler
 )
+from utils.helpers import (
+    get_user_id_from_event,
+    get_table,
+    get_query_param
+)
 
-dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table(os.environ['TABLE_NAME'])
+table = get_table('TABLE_NAME')
 
 @error_handler
 def lambda_handler(event, context):
@@ -17,11 +19,10 @@ def lambda_handler(event, context):
     Authenticated endpoint - requires valid JWT token
     """
     # Extract authenticated user_id from Cognito authorizer claims (for authorization)
-    auth_user_id = event['requestContext']['authorizer']['claims']['sub']
+    auth_user_id = get_user_id_from_event(event)
     
     # Check if requesting another user's profile via query parameter
-    query_params = event.get('queryStringParameters', {}) or {}
-    target_user_id = query_params.get('user_id', auth_user_id)
+    target_user_id = get_query_param(event, 'user_id', auth_user_id)
     
     # Get profile from DynamoDB
     response = table.get_item(Key={'user_id': target_user_id})

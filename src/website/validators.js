@@ -90,7 +90,7 @@ function getValidationConstants() {
     DISPLAY_NAME_MAX_LENGTH,
     BIO_MAX_LENGTH,
     POST_CONTENT_MAX_LENGTH,
-    VALID_POLITICAL_ALIGNMENTS: VALID_POLITICAL_ALIGNMENTS.filter(a => a) // Exclude empty string
+    VALID_POLITICAL_ALIGNMENTS: VALID_POLITICAL_ALIGNMENTS.filter(a => a)
   };
 }
 

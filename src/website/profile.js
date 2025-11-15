@@ -256,25 +256,6 @@ function updateBioCounter() {
   counter.textContent = `${charCount}/500 characters`;
 }
 
-// Format date for display in New Zealand time
-function formatDate(isoString) {
-  if (!isoString) return 'N/A';
-  
-  try {
-    const date = new Date(isoString);
-    return date.toLocaleDateString('en-NZ', {
-      timeZone: 'Pacific/Auckland',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  } catch (error) {
-    return 'Invalid date';
-  }
-}
-
 // Load and display user's posts
 async function loadUserPosts() {
   const postsSection = document.getElementById('user-posts-section');

@@ -1,16 +1,17 @@
-import json
-import os
-import boto3
-from datetime import datetime
 from utils.response_builder import (
     success_response,
     error_response,
     error_handler
 )
 from utils.validators import validate_profile_data
+from utils.helpers import (
+    get_user_id_from_event,
+    get_table,
+    get_current_timestamp,
+    parse_request_body
+)
 
-dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table(os.environ['TABLE_NAME'])
+table = get_table('TABLE_NAME')
 
 @error_handler
 def lambda_handler(event, context):
@@ -19,10 +20,10 @@ def lambda_handler(event, context):
     Authenticated endpoint - user_id extracted from Cognito JWT
     """
     # Extract user_id from Cognito authorizer claims
-    user_id = event['requestContext']['authorizer']['claims']['sub']
+    user_id = get_user_id_from_event(event)
     
     # Parse request body
-    body = json.loads(event.get('body', '{}'))
+    body = parse_request_body(event)
     
     # Extract and validate profile fields
     display_name = body.get('display_name', '').strip()
@@ -35,7 +36,7 @@ def lambda_handler(event, context):
         return error_response(error_msg)
     
     # Create profile item
-    timestamp = datetime.utcnow().isoformat()
+    timestamp = get_current_timestamp()
     profile = {
         'user_id': user_id,
         'display_name': display_name,

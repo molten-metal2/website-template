@@ -1,9 +1,7 @@
-import os
-import boto3
 from utils.response_builder import success_response, error_handler
+from utils.helpers import get_user_id_from_event, get_table
 
-dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table(os.environ['POSTS_TABLE_NAME'])
+table = get_table('POSTS_TABLE_NAME')
 
 @error_handler
 def lambda_handler(event, context):
@@ -12,7 +10,7 @@ def lambda_handler(event, context):
     Authenticated endpoint
     """
     # Extract user_id from Cognito authorizer claims for authentication
-    user_id = event['requestContext']['authorizer']['claims']['sub']
+    user_id = get_user_id_from_event(event)
     
     # Scan all posts (for small scale app)
     # For production with many posts, consider using pagination or DynamoDB Streams

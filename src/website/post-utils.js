@@ -1,13 +1,6 @@
 // Shared Post Utilities
 // This file contains reusable functions for rendering and managing posts
 
-/**
- * Create a post element for display
- * @param {Object} post - Post object with post_id, user_id, display_name, content, created_at, updated_at
- * @param {boolean} isOwner - Whether the current user owns this post
- * @param {boolean} showEditButton - Whether to show edit button (default: false)
- * @returns {HTMLElement} Post card element
- */
 function createPostElement(post, isOwner, showEditButton = false) {
   const postCard = document.createElement('div');
   postCard.className = 'post-card';
@@ -30,7 +23,7 @@ function createPostElement(post, isOwner, showEditButton = false) {
     <div class="post-header">
       <div class="post-author">
         <strong><a href="profile.html?user_id=${post.user_id}">${escapeHtml(post.display_name)}</a></strong>
-        <span class="post-time">${formatPostTime(post.created_at)}</span>
+        <span class="post-time">${formatRelativeTime(post.created_at)}</span>
         ${editedLabel}
       </div>
       ${actionsHtml}
@@ -67,54 +60,21 @@ function createPostElement(post, isOwner, showEditButton = false) {
   return postCard;
 }
 
-/**
- * Format post timestamp for display in New Zealand time
- * @param {string} isoString - ISO 8601 timestamp string
- * @returns {string} Formatted date string
- */
-function formatPostTime(isoString) {
-  if (!isoString) return '';
-  
-  try {
-    const date = new Date(isoString);
-    return date.toLocaleDateString('en-NZ', {
-      timeZone: 'Pacific/Auckland',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  } catch (error) {
-    return '';
-  }
-}
 
-/**
- * Escape HTML to prevent XSS attacks
- * @param {string} text - Text to escape
- * @returns {string} HTML-escaped text
- */
+ // Escape HTML to prevent XSS attacks
+
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
 }
 
-/**
- * Delete post with confirmation dialog
- * @param {string} postId - ID of post to delete
- */
 window.deletePostConfirm = function(postId) {
   if (confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
     deletePostAction(postId);
   }
 };
 
-/**
- * Delete post action - performs the actual deletion
- * @param {string} postId - ID of post to delete
- */
 async function deletePostAction(postId) {
   const postCard = document.querySelector(`[data-post-id="${postId}"]`);
   if (!postCard) return;

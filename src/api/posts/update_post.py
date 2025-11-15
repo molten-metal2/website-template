@@ -1,7 +1,3 @@
-import json
-import os
-import boto3
-from datetime import datetime
 from utils.response_builder import (
     success_response,
     error_response,
@@ -10,9 +6,15 @@ from utils.response_builder import (
     error_handler
 )
 from utils.validators import validate_post_content
+from utils.helpers import (
+    get_user_id_from_event,
+    get_table,
+    get_current_timestamp,
+    parse_request_body,
+    get_path_param
+)
 
-dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table(os.environ['POSTS_TABLE_NAME'])
+table = get_table('POSTS_TABLE_NAME')
 
 @error_handler
 def lambda_handler(event, context):
@@ -21,13 +23,13 @@ def lambda_handler(event, context):
     Authenticated endpoint - only the post owner can update
     """
     # Extract user_id from Cognito authorizer claims
-    user_id = event['requestContext']['authorizer']['claims']['sub']
+    user_id = get_user_id_from_event(event)
     
     # Get post_id from path parameters
-    post_id = event['pathParameters']['post_id']
+    post_id = get_path_param(event, 'post_id')
     
     # Parse request body
-    body = json.loads(event.get('body', '{}'))
+    body = parse_request_body(event)
     
     # Validate content
     content = body.get('content', '').strip()
@@ -45,7 +47,7 @@ def lambda_handler(event, context):
         return forbidden_response('Forbidden - You can only edit your own posts')
     
     # Update post
-    timestamp = datetime.utcnow().isoformat()
+    timestamp = get_current_timestamp()
     
     response = table.update_item(
         Key={'post_id': post_id},
