@@ -8,6 +8,7 @@ const DISPLAY_NAME_MIN_LENGTH = 2;
 const DISPLAY_NAME_MAX_LENGTH = 20;
 const BIO_MAX_LENGTH = 500;
 const POST_CONTENT_MAX_LENGTH = 280;
+const COMMENT_CONTENT_MAX_LENGTH = 200;
 const VALID_POLITICAL_ALIGNMENTS = ['National', 'Labour', 'Independent', ''];
 
 function validateDisplayName(displayName) {
@@ -65,6 +66,18 @@ function validatePostContent(content) {
   return { isValid: true, error: null };
 }
 
+function validateCommentContent(content) {
+  if (!content || !content.trim()) {
+    return { isValid: false, error: 'Comment content is required' };
+  }
+
+  if (content.length > COMMENT_CONTENT_MAX_LENGTH) {
+    return { isValid: false, error: `Comment must not exceed ${COMMENT_CONTENT_MAX_LENGTH} characters` };
+  }
+
+  return { isValid: true, error: null };
+}
+
 function validateProfileData(displayName, bio, politicalAlignment) {
   let result = validateDisplayName(displayName);
   if (!result.isValid) {
@@ -90,6 +103,7 @@ function getValidationConstants() {
     DISPLAY_NAME_MAX_LENGTH,
     BIO_MAX_LENGTH,
     POST_CONTENT_MAX_LENGTH,
+    COMMENT_CONTENT_MAX_LENGTH,
     VALID_POLITICAL_ALIGNMENTS: VALID_POLITICAL_ALIGNMENTS.filter(a => a)
   };
 }

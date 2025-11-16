@@ -4,6 +4,7 @@ BIO_MAX_LENGTH = 500
 VALID_POLITICAL_ALIGNMENTS = ['National', 'Labour', 'Independent', '']
 
 POST_CONTENT_MAX_LENGTH = 280
+COMMENT_CONTENT_MAX_LENGTH = 200
 
 
 def validate_display_name(display_name):
@@ -49,6 +50,16 @@ def validate_post_content(content):
     
     if len(content) > POST_CONTENT_MAX_LENGTH:
         return (False, f'Content must not exceed {POST_CONTENT_MAX_LENGTH} characters')
+    
+    return (True, None)
+
+
+def validate_comment_content(content):
+    if not content or not content.strip():
+        return (False, 'Comment content is required')
+    
+    if len(content) > COMMENT_CONTENT_MAX_LENGTH:
+        return (False, f'Comment must not exceed {COMMENT_CONTENT_MAX_LENGTH} characters')
     
     return (True, None)
 

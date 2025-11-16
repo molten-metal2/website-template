@@ -1,7 +1,7 @@
 // Shared Post Utilities
 // This file contains reusable functions for rendering and managing posts
 
-function createPostElement(post, isOwner, showEditButton = false, showDeleteButton = false) {
+function createPostElement(post, isOwner, showEditButton = false, showDeleteButton = false, showCommentsPreview = true) {
   const postCard = document.createElement('div');
   postCard.className = 'post-card';
   postCard.dataset.postId = post.post_id;
@@ -21,6 +21,12 @@ function createPostElement(post, isOwner, showEditButton = false, showDeleteButt
     actionsHtml += '</div>';
   }
   
+  // Like/Comment counts
+  const likeCount = post.like_count || 0;
+  const commentCount = post.comment_count || 0;
+  const likedByUser = post.liked_by_user || false;
+  const likedClass = likedByUser ? 'liked' : '';
+  
   postCard.innerHTML = `
     <div class="post-header">
       <div class="post-author">
@@ -33,6 +39,17 @@ function createPostElement(post, isOwner, showEditButton = false, showDeleteButt
     <div class="post-content">
       <p class="post-text">${escapeHtml(post.content)}</p>
     </div>
+    <div class="post-interactions">
+      <button class="like-btn ${likedClass}" data-post-id="${post.post_id}">
+        <span class="like-icon">❤</span>
+        <span class="like-count">${likeCount}</span>
+      </button>
+      <button class="comment-btn" onclick="viewPostDetail('${post.post_id}')">
+        <span class="comment-icon">💬</span>
+        <span class="comment-count">${commentCount}</span>
+      </button>
+    </div>
+    ${showCommentsPreview ? `<div class="comments-preview" data-post-id="${post.post_id}"></div>` : ''}
     ${showEditButton ? `
       <div class="post-edit-form" style="display: none;">
         <textarea class="edit-input" maxlength="${getValidationConstants().POST_CONTENT_MAX_LENGTH}">${escapeHtml(post.content)}</textarea>
@@ -58,6 +75,20 @@ function createPostElement(post, isOwner, showEditButton = false, showDeleteButt
         editCharCounter.textContent = `${length}/${maxLength}`;
       });
     }
+  }
+  
+  // Add like button click handler
+  const likeBtn = postCard.querySelector('.like-btn');
+  if (likeBtn) {
+    likeBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      await togglePostLike(post.post_id, likeBtn);
+    });
+  }
+  
+  // Load comments preview if enabled
+  if (showCommentsPreview && commentCount > 0) {
+    loadCommentsPreview(post.post_id);
   }
   
   return postCard;
@@ -168,4 +199,78 @@ async function deletePostAction(postId) {
     }
   }
 }
+
+// Toggle like on a post
+async function togglePostLike(postId, likeBtn) {
+  if (likeBtn.disabled) return;
+  
+  likeBtn.disabled = true;
+  const likeCountSpan = likeBtn.querySelector('.like-count');
+  const currentCount = parseInt(likeCountSpan.textContent) || 0;
+  const isLiked = likeBtn.classList.contains('liked');
+  
+  try {
+    const result = await likePost(postId);
+    
+    // Update UI based on result
+    if (result.liked) {
+      likeBtn.classList.add('liked');
+      likeCountSpan.textContent = currentCount + 1;
+    } else {
+      likeBtn.classList.remove('liked');
+      likeCountSpan.textContent = Math.max(0, currentCount - 1);
+    }
+  } catch (error) {
+    console.error('Failed to toggle like:', error);
+    alert('Failed to like post. Please try again.');
+  } finally {
+    likeBtn.disabled = false;
+  }
+}
+
+// Load comments preview (first 2-3 comments)
+async function loadCommentsPreview(postId) {
+  const previewContainer = document.querySelector(`.comments-preview[data-post-id="${postId}"]`);
+  if (!previewContainer) return;
+  
+  try {
+    const comments = await getComments(postId);
+    
+    if (comments.length === 0) {
+      previewContainer.style.display = 'none';
+      return;
+    }
+    
+    // Show first 2 comments
+    const previewComments = comments.slice(0, 2);
+    
+    let previewHtml = '<div class="comments-preview-list">';
+    previewComments.forEach(comment => {
+      previewHtml += `
+        <div class="comment-preview">
+          <strong>${escapeHtml(comment.display_name)}</strong>
+          <span>${escapeHtml(comment.content)}</span>
+        </div>
+      `;
+    });
+    
+    if (comments.length > 2) {
+      previewHtml += `<a href="post-detail.html?post_id=${postId}" class="view-all-comments">View all ${comments.length} comments</a>`;
+    } else if (comments.length > 0) {
+      previewHtml += `<a href="post-detail.html?post_id=${postId}" class="view-all-comments">View comments</a>`;
+    }
+    
+    previewHtml += '</div>';
+    previewContainer.innerHTML = previewHtml;
+    previewContainer.style.display = 'block';
+  } catch (error) {
+    console.error('Failed to load comments preview:', error);
+    previewContainer.style.display = 'none';
+  }
+}
+
+// Navigate to post detail page
+window.viewPostDetail = function(postId) {
+  window.location.href = `post-detail.html?post_id=${postId}`;
+};
 
