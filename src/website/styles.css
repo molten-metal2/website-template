@@ -437,22 +437,16 @@ select:focus {
   border-color: #1a73e8;
 }
 
-/* Disabled state - look like read-only text */
+/* Disabled state - keep white boxes but make read-only */
 input[type="text"]:disabled,
 input[type="email"]:disabled,
 textarea:disabled,
 select:disabled {
-  background-color: transparent;
-  border: none;
-  padding: 0;
+  background-color: #f9f9f9;
+  border: 1px solid #e0e0e0;
   color: #333;
   cursor: default;
   opacity: 1;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  font-size: 15px;
-  line-height: 1.6;
 }
 
 textarea {
