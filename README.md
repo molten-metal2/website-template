@@ -18,6 +18,17 @@ Website Template/
 └── CSS_PRINCIPLES.md       # CSS design principles and guidelines
 ```
 
+## 🚀 Local Development
+
+Simply open `src/website/index.html` in your browser, or use a local development server:
+
+```bash
+# Python 3
+cd src/website
+python -m http.server 8000
+```
+
+Then visit `http://localhost:8000` in your browser.
 
 ## 🌐 Deployment
 
@@ -27,6 +38,31 @@ Deploy your website and updates automatically using AWS and Terraform
    - AWS account
    - AWS CLI configured
    - Terraform installed
+
+### 🔧 **Customize Terraform Configuration First**
+
+Before deploying, you need to customize the Terraform files for your project. Look for `# CUSTOMIZE:` comments in these files:
+
+**📄 `terraform/variables.tf`:**
+- **`bucket_name`** (line 3) - Must be globally unique across all AWS
+  - Example: `yourname-website-2024`, `mycompany-portfolio-prod`
+
+**📄 `terraform/bootstrap/main.tf`:**
+- **`bucket`** (line 15) - Terraform state bucket (globally unique)
+  - Example: `yourname-terraform-state`
+- **DynamoDB `name`** (line 46) - State lock table name
+  - Example: `yourname-terraform-locks`
+
+**📄 `terraform/main.tf`:**
+- **Backend config** (lines 3-6) - Must match your bootstrap names exactly
+
+**⚠️ Important**: 
+- S3 bucket names must be globally unique
+- Bucket names in `main.tf` backend must match `bootstrap/main.tf` outputs
+
+---
+
+### 📋 **Deployment Steps**
 
 1. **Setup AWS Credentials**
    
@@ -83,13 +119,12 @@ Deploy your website and updates automatically using AWS and Terraform
    - Click **Run workflow** → **Run workflow**
    - Wait for it to complete (creates S3 bucket and DynamoDB table for Terraform state)
 
-4. **Deploy**
-   - Push to `main` branch (triggers automatic deployment)
-   - OR manually: Go to **Actions** → **Deploy to AWS** → **Run workflow**
+4. **Deploy Your Website**
+   - **Option A (Automatic)**: Push to `main` branch - triggers deployment automatically
+   - **Option B (Manual)**: Go to **Actions** → **Deploy to AWS** → **Run workflow**
    - Your site will be deployed to CloudFront + S3
    - The deployment URL will be shown in the workflow output
 
-5.  **GitHub Pages**: Copy `src/website/` contents to your repo root
 
 ## 🎯 Next Steps
 

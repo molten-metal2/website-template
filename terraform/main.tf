@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket         = "politicnz-terraform-state"
+    bucket         = "website-template-terraform-state"  # CUSTOMIZE: Change to match your bootstrap bucket name
     key            = "terraform.tfstate"
-    region         = "ap-southeast-2"
-    dynamodb_table = "politicnz-terraform-locks"
+    region         = "ap-southeast-2"  # CUSTOMIZE: Change to match your AWS region
+    dynamodb_table = "website-template-terraform-locks"  # CUSTOMIZE: Change to match your bootstrap table name
     encrypt        = true
   }
 
@@ -30,8 +30,8 @@ resource "aws_s3_bucket" "website" {
 
 # CloudFront Origin Access Control - secure access to S3
 resource "aws_cloudfront_origin_access_control" "website" {
-  name                              = "politicnz-oac"
-  description                       = "Origin Access Control for PoliticNZ website"
+  name                              = "website-template-oac"  # CUSTOMIZE: Change to your project name
+  description                       = "Origin Access Control for website"  # CUSTOMIZE: Update description
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
