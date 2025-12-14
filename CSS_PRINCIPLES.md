@@ -1,10 +1,10 @@
-# CSS Principles - PoliticNZ
+# CSS Principles
 
-This document outlines the key principles and guidelines we follow for styling the PoliticNZ application.
+This document outlines the key principles and guidelines for styling this website template.
 
 ## Core Philosophy
 
-**Keep it lean.** Our CSS is intentionally minimal, including only what's necessary for functionality and clean presentation.
+**Keep it lean.** Our CSS is intentionally minimal, including only what's necessary for functionality and clean presentation. This template provides a solid foundation for building any website.
 
 ## Design Principles
 
@@ -73,21 +73,20 @@ This document outlines the key principles and guidelines we follow for styling t
 
 CSS is organized in logical sections:
 1. **Reset and Base Styles** - Global resets and body styles
-2. **Navbar** - Navigation component
-3. **Main Content** - Page layout containers
-4. **Feed Container** - Feed-specific layout
-5. **Create Post Card** - Post creation UI
-6. **Post Cards** - Individual post styling
-7. **Post Interactions** - Like/comment buttons
-8. **Edit Form** - Inline editing components
-9. **Comments Preview** - Comment preview styling
-10. **States** - Loading, error, empty states
+2. **Navbar Styles** - Navigation component
+3. **Main Content Styles** - Page layout containers
+4. **Header Section** - Hero/header area styling
+5. **Content Sections** - Content blocks and cards
+6. **Buttons** - Button styles and interactions
+7. **Responsive Design** - Mobile-friendly breakpoints
 
-## Version Management
+## Customization
 
-- CSS files use query string versioning: `styles.css?v=2.0.0`
-- Increment version when CSS changes to bust browser cache
-- Keep version consistent across all HTML files
+This template is designed to be easily customizable:
+- Update colors in the color palette section
+- Modify the navbar links in `navbar.html`
+- Add new content sections following the existing patterns
+- Extend the CSS with your own styles while maintaining the principles
 
 ## Don't Do
 
