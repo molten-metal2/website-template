@@ -32,7 +32,6 @@ Then visit `http://localhost:8000` in your browser.
 
 ## 🌐 Deployment
 
-Deploy your website and updates automatically using AWS and Terraform
 
 **Prerequisites**
    - AWS account
@@ -121,7 +120,6 @@ Before deploying, you need to customize the Terraform files for your project. Lo
 
 4. **Deploy Your Website**
    - **Option A (Automatic)**: Push to `main` branch - triggers deployment automatically
-   - **Option B (Manual)**: Go to **Actions** → **Deploy to AWS** → **Run workflow**
    - Your site will be deployed to CloudFront + S3
    - The deployment URL will be shown in the workflow output
 
